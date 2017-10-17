@@ -1,7 +1,9 @@
 
 extern crate core;
 extern crate ring;
+extern crate untrusted;
 
+pub mod asym;
 pub mod sym;
 
 pub trait ToAlgorithm {
@@ -9,6 +11,10 @@ pub trait ToAlgorithm {
     fn to_algorithm(&self) -> Self::Algorithm;
 }
 
+pub trait ToPublicKey {
+    type PublicKey;
+    fn to_public_key( &self) -> Self::PublicKey;
+}
 
 #[cfg(test)]
 mod tests {

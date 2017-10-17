@@ -5,3 +5,4 @@ authors = ["James Parker <jp@pkauth.com>"]
 
 [dependencies]
 ring="*"
+untrusted="*"
