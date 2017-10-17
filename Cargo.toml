@@ -1,0 +1,7 @@
+[package]
+name = "crypto-abstract"
+version = "0.1.0"
+authors = ["James Parker <jp@pkauth.com>"]
+
+[dependencies]
+ring="*"
