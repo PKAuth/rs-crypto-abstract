@@ -17,7 +17,7 @@ pub enum Key {
 }
 
 pub enum CipherText {
-    SEAesGcm256( Vec<u8>)
+    SEAesGcm256( Vec<u8>, Vec<u8>) // (Nonce, Ciphertext)
 }
 
 pub fn gen ( rng : &SystemRandom, alg : Algorithm) -> Result<Key,Unspecified> {
@@ -28,8 +28,20 @@ pub fn gen ( rng : &SystemRandom, alg : Algorithm) -> Result<Key,Unspecified> {
 
 pub fn encrypt ( rng : &SystemRandom, key : &Key, plaintext : Vec<u8>) -> Result<CipherText, Unspecified> {
     match key {
-        &Key::SEAesGcm256( key) => Ok( CipherText::SEAesGcm256( aesgcm256::encrypt( &rng, &key, plaintext)?))
+        &Key::SEAesGcm256( key) => {
+            let (n, c) = aesgcm256::encrypt( &rng, &key, plaintext)?;
+            Ok( CipherText::SEAesGcm256( n, c))
+        }
+
     }
+}
+
+pub fn decrypt ( key : &Key, ciphertext : CipherText) -> Result<Vec<u8>, Unspecified> {
+    match (key, ciphertext) {
+        (&Key::SEAesGcm256( key), CipherText::SEAesGcm256( nonce, ciphertext)) =>
+            aesgcm256::decrypt( &key, &nonce, ciphertext)
+    }
+
 }
 
 impl ToAlgorithm for Key {
@@ -47,7 +59,7 @@ impl ToAlgorithm for CipherText {
 
     fn to_algorithm (&self) -> Self::Algorithm {
         match *self {
-            CipherText::SEAesGcm256(_) => Algorithm::SEAesGcm256
+            CipherText::SEAesGcm256(_,_) => Algorithm::SEAesGcm256
         }
     }
 }

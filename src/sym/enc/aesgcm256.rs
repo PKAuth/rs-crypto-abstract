@@ -17,7 +17,7 @@ pub(super) fn gen ( rng : &SystemRandom) -> Result<[u8; 256],Unspecified> {
     Ok(bytes)
 }
 
-pub fn encrypt ( rng : &SystemRandom, key : &[u8;256], mut plaintext : Vec<u8>) -> Result<Vec<u8>, Unspecified> {
+pub(super) fn encrypt ( rng : &SystemRandom, key : &[u8;256], mut plaintext : Vec<u8>) -> Result<(Vec<u8>, Vec<u8>), Unspecified> {
     // Convert key.
     let key = aead::SealingKey::new( &aead::AES_256_GCM, key)?;
 
@@ -29,9 +29,22 @@ pub fn encrypt ( rng : &SystemRandom, key : &[u8;256], mut plaintext : Vec<u8>) 
     let l = plaintext.len() + aead::AES_256_GCM.tag_len();
     plaintext.resize( l, 0);
 
-    // Encrypt key
+    // Encrypt.
     let len = aead::seal_in_place( &key, &nonce, &[], plaintext.as_mut_slice(), aead::AES_256_GCM.tag_len())?;
 
     // Truncate unused.
-    Ok( plaintext[..len].to_vec())
+    let c = plaintext[..len].to_vec();
+    Ok(( nonce, c))
+}
+
+pub(super) fn decrypt ( key : &[u8;256], nonce : &[u8], mut ciphertext : Vec<u8>) -> Result<Vec<u8>, Unspecified> {
+    // Convert key.
+    let key = aead::OpeningKey::new( &aead::AES_256_GCM, key)?;
+
+    // TODO: Do we need to expand output? XXX
+
+    // Decrypt.
+    let res = aead::open_in_place( &key, nonce, &[], 0, ciphertext.as_mut_slice())?;
+
+    Ok( res.to_vec())
 }
