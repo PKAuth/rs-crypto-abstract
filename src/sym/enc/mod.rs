@@ -8,6 +8,7 @@ use ring::rand::{SystemRandom};
 
 use ToAlgorithm;
 
+#[derive(Eq,PartialEq)]
 pub enum Algorithm {
     SEAesGcm256
 }
