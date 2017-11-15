@@ -21,9 +21,9 @@ pub enum CipherText {
     SEAesGcm256( Vec<u8>, Vec<u8>) // (Nonce, Ciphertext)
 }
 
-pub fn gen ( rng : &SystemRandom, alg : Algorithm) -> Result<Key,Unspecified> {
+pub fn gen ( rng : &SystemRandom, alg : &Algorithm) -> Result<Key,Unspecified> {
     match alg {
-        Algorithm::SEAesGcm256 => Ok( Key::SEAesGcm256( aesgcm256::gen( rng)?))
+        &Algorithm::SEAesGcm256 => Ok( Key::SEAesGcm256( aesgcm256::gen( rng)?))
     }
 }
 
