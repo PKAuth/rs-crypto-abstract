@@ -4,6 +4,7 @@ extern crate ring;
 extern crate untrusted;
 
 pub mod asym;
+mod internal;
 pub mod sym;
 
 pub trait ToAlgorithm {

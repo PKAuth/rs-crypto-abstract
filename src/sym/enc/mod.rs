@@ -6,6 +6,7 @@ mod aesgcm256;
 use ring::error::Unspecified;
 use ring::rand::{SystemRandom};
 
+use internal::{derive_key_256};
 use ToAlgorithm;
 
 #[derive(Eq,PartialEq)]
@@ -14,7 +15,7 @@ pub enum Algorithm {
 }
 
 pub enum Key {
-    SEAesGcm256( [u8;256])
+    SEAesGcm256( [u8;32])
 }
 
 pub enum CipherText {
@@ -24,6 +25,12 @@ pub enum CipherText {
 pub fn gen ( rng : &SystemRandom, alg : &Algorithm) -> Result<Key,Unspecified> {
     match alg {
         &Algorithm::SEAesGcm256 => Ok( Key::SEAesGcm256( aesgcm256::gen( rng)?))
+    }
+}
+
+pub fn derive_key( alg : &Algorithm, salt : &Vec<u8>, password : &Vec<u8>) -> Key {
+    match alg {
+        &Algorithm::SEAesGcm256 => Key::SEAesGcm256( derive_key_256( salt, password))
     }
 }
 
