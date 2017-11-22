@@ -14,6 +14,7 @@ pub enum Algorithm {
     SEAesGcm256
 }
 
+#[derive(Clone)]
 pub enum Key {
     SEAesGcm256( [u8;32])
 }
