@@ -22,7 +22,7 @@ pub(super) fn encrypt ( rng : &SystemRandom, key : &[u8;32], mut plaintext : Vec
     let key = aead::SealingKey::new( &aead::AES_256_GCM, key)?;
 
     // Generate nonce.
-    let mut nonce = vec![0; aead::AES_256_GCM.tag_len()]; // 32];
+    let mut nonce = vec![0; 12]; // aead::AES_256_GCM.tag_len()]; // 32];
     rng.fill(&mut nonce)?;
 
     // TODO: Do we need to expand plaintext? XXX
