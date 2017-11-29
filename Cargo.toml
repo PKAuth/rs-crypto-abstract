@@ -4,5 +4,7 @@ version = "0.1.0"
 authors = ["James Parker <jp@pkauth.com>"]
 
 [dependencies]
-ring="*"
-untrusted="0.5.1"
+# ring="*"
+ring = {git = "https://github.com/briansmith/ring.git", ref = "8411c0098ac1f8b4b96d0766a5057aae5e78c42a"}
+# untrusted=">= 0.5.1"
+untrusted="0.6.0"
