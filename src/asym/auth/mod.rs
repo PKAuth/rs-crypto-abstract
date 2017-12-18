@@ -11,6 +11,7 @@ use ToPublicKey;
 
 // TODO: AARsa2048Pss256 XXX
 
+#[derive(Eq,PartialEq)]
 pub enum Algorithm {
     AAEd25519
 }
