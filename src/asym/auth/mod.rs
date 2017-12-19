@@ -67,6 +67,16 @@ impl ToAlgorithm for PrivateKey {
     }
 }
 
+impl ToAlgorithm for Signature {
+    type Algorithm = Algorithm;
+
+    fn to_algorithm (&self) -> Self::Algorithm {
+        match *self {
+            Signature::AAEd25519(_) => Algorithm::AAEd25519
+        }
+    }
+}
+
 impl ToPublicKey for PrivateKey {
     type PublicKey = PublicKey;
 
