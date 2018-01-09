@@ -4,5 +4,6 @@ version = "0.1.0"
 authors = ["James Parker <jp@pkauth.com>"]
 
 [dependencies]
+boolinator="*"
 ring="*"
 untrusted="0.5.1"

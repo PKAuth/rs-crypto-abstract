@@ -3,7 +3,7 @@ mod ed25519;
 
 use ring::error::Unspecified;
 use ring::rand::SystemRandom;
-use ring::signature;
+// use ring::signature;
 // use ring::signature::Ed25519KeyPair;
 
 use ToAlgorithm;
@@ -25,7 +25,7 @@ pub enum PrivateKey {
 }
 
 pub enum Signature {
-    AAEd25519 (signature::Signature)
+    AAEd25519 ([u8; ed25519::SIGNATURELENGTH])
 }
 
 pub fn gen ( rng : &SystemRandom, alg : &Algorithm) -> Result<PrivateKey,Unspecified> {
