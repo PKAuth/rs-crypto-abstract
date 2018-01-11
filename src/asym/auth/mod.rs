@@ -16,6 +16,7 @@ pub enum Algorithm {
     AAEd25519
 }
 
+#[derive(Eq,PartialEq,Debug)]
 pub enum PublicKey {
     AAEd25519 ([u8; ed25519::PUBLICKEYLENGTH])
 }
