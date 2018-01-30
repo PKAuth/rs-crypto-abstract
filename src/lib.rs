@@ -1,4 +1,6 @@
+#![deny(warnings)]
 
+extern crate boolinator;
 extern crate core;
 extern crate ring;
 extern crate untrusted;
