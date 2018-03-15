@@ -9,15 +9,15 @@ use ring::aead;
 use ring::error::Unspecified;
 use ring::rand::{SecureRandom, SystemRandom};
 
-pub(super) fn gen ( rng : &SystemRandom) -> Result<[u8; 32],Unspecified> {
+pub(super) fn gen ( rng : &SystemRandom) -> Result<[u8; KEYLENGTH],Unspecified> {
     // Generate random key.
-    let mut bytes : [u8; 32] = [0; 32];
+    let mut bytes : [u8; KEYLENGTH] = [0; KEYLENGTH];
     rng.fill( &mut bytes)?;
 
     Ok(bytes)
 }
 
-pub(super) fn encrypt ( rng : &SystemRandom, key : &[u8;32], mut plaintext : Vec<u8>) -> Result<(Vec<u8>, Vec<u8>), Unspecified> {
+pub(crate) fn encrypt ( rng : &SystemRandom, key : &[u8;KEYLENGTH], mut plaintext : Vec<u8>) -> Result<(Vec<u8>, Vec<u8>), Unspecified> {
     // Convert key.
     let key = aead::SealingKey::new( &aead::AES_256_GCM, key)?;
 
@@ -37,7 +37,7 @@ pub(super) fn encrypt ( rng : &SystemRandom, key : &[u8;32], mut plaintext : Vec
     Ok(( nonce, c))
 }
 
-pub(super) fn decrypt ( key : &[u8;32], nonce : &[u8], mut ciphertext : Vec<u8>) -> Result<Vec<u8>, Unspecified> {
+pub(crate) fn decrypt ( key : &[u8;KEYLENGTH], nonce : &[u8], mut ciphertext : Vec<u8>) -> Result<Vec<u8>, Unspecified> {
     // Convert key.
     let key = aead::OpeningKey::new( &aead::AES_256_GCM, key)?;
 
@@ -48,3 +48,6 @@ pub(super) fn decrypt ( key : &[u8;32], nonce : &[u8], mut ciphertext : Vec<u8>)
 
     Ok( res.to_vec())
 }
+
+pub(super) const KEYLENGTH : usize = 32;
+

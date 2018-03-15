@@ -1,5 +1,5 @@
 
-mod aesgcm256;
+pub(crate) mod aesgcm256;
 
 // use sym::enc;
 // use sym::enc::aesgcm256;
@@ -16,7 +16,7 @@ pub enum Algorithm {
 
 #[derive(Clone)]
 pub enum Key {
-    SEAesGcm256( [u8;32])
+    SEAesGcm256( [u8; aesgcm256::KEYLENGTH])
 }
 
 pub enum CipherText {
@@ -29,7 +29,7 @@ pub fn gen ( rng : &SystemRandom, alg : &Algorithm) -> Result<Key,Unspecified> {
     }
 }
 
-pub fn derive_key( alg : &Algorithm, salt : &Vec<u8>, password : &Vec<u8>) -> Key {
+pub fn derive_key( alg : &Algorithm, salt : &[u8], password : &[u8]) -> Key {
     match alg {
         &Algorithm::SEAesGcm256 => Key::SEAesGcm256( derive_key_256( salt, password))
     }

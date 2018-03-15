@@ -1,10 +1,11 @@
 
-use boolinator::Boolinator;
 use ring::error::Unspecified;
 use ring::rand::SystemRandom;
 use ring::signature;
 use ring::signature::{Ed25519KeyPair};
 use untrusted::Input;
+
+use internal::{u8_to_fixed_length_64};
 
 // Generates a private key.
 pub(super) fn gen ( rng : &SystemRandom) -> Result<[u8; 85], Unspecified> {
@@ -17,11 +18,7 @@ pub(super) fn sign( key : &[u8; PRIVATEKEYLENGTH], message : &Vec<u8>) -> Result
     let sig = key.sign( &message);
 
     // Copy result to fixed length array.
-    (sig.as_ref().len() == SIGNATURELENGTH).ok_or( Unspecified)?;
-    let mut res = [0u8; SIGNATURELENGTH];
-    for (place, element) in res.iter_mut().zip( sig.as_ref()) {
-        *place = *element;
-    }
+    let res = u8_to_fixed_length_64( sig.as_ref()).ok_or(Unspecified)?;
     Ok( res)
 }
 
