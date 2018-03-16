@@ -5,5 +5,7 @@ authors = ["James Parker <jp@pkauth.com>"]
 
 [dependencies]
 boolinator="*"
-ring="*"
-untrusted="0.5.1"
+# ring="*"
+# ring={path="/Users/james/Documents/Projects/ring"}
+ring={git = "https://github.com/jprider63/ring.git"}
+untrusted="0.6.1"
