@@ -3,18 +3,13 @@ use ring::agreement::*;
 use ring::rand::SystemRandom;
 use untrusted::Input;
 
-use internal::{sha256, u8_to_fixed_length_32};
+use internal::{sha256};
 use sym::enc;
 // TODO: Figure out how to import this... XXX
 // use sym::enc::aesgcm256;
 
-pub(super) fn gen( rng : &SystemRandom) -> Option<[u8; PRIVATEKEYLENGTH]> {
-    let private_key = ReusablePrivateKey::generate( &X25519, rng).ok()?;
-
-    let private_key = private_key.private_key_bytes();
-
-    // Convert to 32 bytes.
-    u8_to_fixed_length_32( private_key)
+pub(super) fn gen( rng : &SystemRandom) -> Option<ReusablePrivateKey> {
+    ReusablePrivateKey::generate( &X25519, rng).ok()
 }
 
 pub(super) fn encrypt( rng : &SystemRandom, public_key : &[u8;PUBLICKEYLENGTH], plaintext : Vec<u8>) -> Option<([u8;PUBLICKEYLENGTH], Vec<u8>, Vec<u8>)> {
@@ -39,20 +34,17 @@ pub(super) fn encrypt( rng : &SystemRandom, public_key : &[u8;PUBLICKEYLENGTH], 
     Some( ( ephemeral_public_key, nonce, encrypted))
 }
 
-pub(super) fn decrypt( private_key : &[u8; PRIVATEKEYLENGTH], ciphertext : (&[u8;PUBLICKEYLENGTH], &Vec<u8>, Vec<u8>)) -> Option<Vec<u8>> {
+pub(super) fn decrypt( private_key : &ReusablePrivateKey, ciphertext : (&[u8;PUBLICKEYLENGTH], &Vec<u8>, Vec<u8>)) -> Option<Vec<u8>> {
     let (emphemeral_public_key, nonce, ciphertext) = ciphertext;
 
-    let private_key = ReusablePrivateKey::from_bytes( &X25519, Input::from( private_key)).ok()?;
-
     let secret_key = agree_reusable( &private_key, &X25519, Input::from( emphemeral_public_key), (), {|k| Ok( sha256(k))}).ok()?;
-
 
     enc::aesgcm256::decrypt( &secret_key, nonce, ciphertext).ok()
 }
 
 // TODO: Figure these out XXX
-pub(super) const PRIVATEKEYLENGTH : usize = 32;
-pub(super) const PUBLICKEYLENGTH : usize = 1; 
+// pub(super) const PRIVATEKEYLENGTH : usize = 32;
+pub(super) const PUBLICKEYLENGTH : usize = 32; 
 
 // TODO: Get rid of this XXX
 // pub(super) const SECRETKEYLENGTH : usize = 32;
