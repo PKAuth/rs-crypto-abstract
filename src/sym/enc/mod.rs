@@ -29,10 +29,16 @@ pub fn gen ( rng : &SystemRandom, alg : &Algorithm) -> Result<Key,Unspecified> {
     }
 }
 
+// By default uses 4000 rounds of sha256.
 pub fn derive_key( alg : &Algorithm, salt : &[u8], password : &[u8]) -> Key {
+    derive_key_with_iterations( alg, salt, password, 4000)
+}
+
+pub fn derive_key_with_iterations( alg : &Algorithm, salt : &[u8], password : &[u8], iterations : u32) -> Key {
     match alg {
-        &Algorithm::SEAesGcm256 => Key::SEAesGcm256( derive_key_256( salt, password))
+        &Algorithm::SEAesGcm256 => Key::SEAesGcm256( derive_key_256( salt, password, iterations))
     }
+
 }
 
 pub fn encrypt ( rng : &SystemRandom, key : &Key, plaintext : Vec<u8>) -> Result<CipherText, Unspecified> {
