@@ -1,5 +1,5 @@
 
-mod x25519aesgcm256;
+mod x25519;
 
 use ring::agreement::ReusablePrivateKey;
 use ring::rand::SystemRandom;
@@ -18,7 +18,7 @@ pub enum Algorithm {
 
 #[derive(Eq,PartialEq)]
 pub enum PublicKey {
-    AEX25519 ([u8;x25519aesgcm256::PUBLICKEYLENGTH])
+    AEX25519 ([u8;x25519::PUBLICKEYLENGTH])
 }
 
 pub enum PrivateKey {
@@ -26,13 +26,13 @@ pub enum PrivateKey {
 }
 
 pub enum CipherText {
-    AEX25519 ([u8;x25519aesgcm256::PUBLICKEYLENGTH], se::CipherText)
+    AEX25519 ([u8;x25519::PUBLICKEYLENGTH], se::CipherText)
 }
 
 pub fn gen( rng : &SystemRandom, alg : &Algorithm) -> Option<PrivateKey> {
     match alg {
         &Algorithm::AEX25519 => {
-            Some( PrivateKey::AEX25519( x25519aesgcm256::gen( rng)?))
+            Some( PrivateKey::AEX25519( x25519::gen( rng)?))
         }
     }
 }
@@ -40,7 +40,7 @@ pub fn gen( rng : &SystemRandom, alg : &Algorithm) -> Option<PrivateKey> {
 pub fn encrypt( rng : &SystemRandom, algorithm : &se::Algorithm, key : &PublicKey, message : Vec<u8>) -> Option<CipherText> {
     match key {
         &PublicKey::AEX25519( key) => {
-            let (ephemeral_public_key, ciphertext) = x25519aesgcm256::encrypt( rng, algorithm, &key, message)?;
+            let (ephemeral_public_key, ciphertext) = x25519::encrypt( rng, algorithm, &key, message)?;
             Some( CipherText::AEX25519( ephemeral_public_key, ciphertext))
         }
     }
@@ -50,7 +50,7 @@ pub fn decrypt( private_key : &PrivateKey, ciphertext : CipherText) -> Option<Ve
     match private_key {
         &PrivateKey::AEX25519(ref private_key) => match ciphertext {
             CipherText::AEX25519(ephemeral_public_key, ciphertext) => {
-                x25519aesgcm256::decrypt( &private_key, ( &ephemeral_public_key, ciphertext))
+                x25519::decrypt( &private_key, ( &ephemeral_public_key, ciphertext))
             }
         }
     }
