@@ -23,7 +23,7 @@ fn x25519_encrypt_and_decrypt() {
         let encrypted = ae::encrypt( &rng, &se::Algorithm::SEAesGcm256, &public_key, content.clone()).unwrap();
 
         // Decrypt content.
-        let decrypted = ae::decrypt( &key, encrypted).unwrap();
+        let decrypted = ae::decrypt( &rng, &key, encrypted).unwrap();
 
         // Ensure decrypted content matches.
         assert_eq!( content, decrypted)

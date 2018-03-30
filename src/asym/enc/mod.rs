@@ -1,9 +1,10 @@
 
-mod x25519;
+pub(crate) mod x25519;
 
 use ring::agreement::ReusablePrivateKey;
 use ring::rand::SystemRandom;
 
+use internal::asym::enc::*;
 use internal::u8_to_fixed_length_32;
 use sym::enc as se;
 
@@ -26,7 +27,7 @@ pub enum PrivateKey {
 }
 
 pub enum CipherText {
-    AEX25519 ([u8;x25519::PUBLICKEYLENGTH], se::CipherText)
+    CipherText (EncryptedKey, se::CipherText)
 }
 
 pub fn gen( rng : &SystemRandom, alg : &Algorithm) -> Option<PrivateKey> {
@@ -38,22 +39,17 @@ pub fn gen( rng : &SystemRandom, alg : &Algorithm) -> Option<PrivateKey> {
 }
 
 pub fn encrypt( rng : &SystemRandom, algorithm : &se::Algorithm, key : &PublicKey, message : Vec<u8>) -> Option<CipherText> {
-    match key {
-        &PublicKey::AEX25519( key) => {
-            let (ephemeral_public_key, ciphertext) = x25519::encrypt( rng, algorithm, &key, message)?;
-            Some( CipherText::AEX25519( ephemeral_public_key, ciphertext))
-        }
-    }
+    let (encrypted_key, key) = encrypt_symmetric_key( rng, algorithm, key)?;
+
+    let ciphertext = se::encrypt( rng, &key, message).ok()?;
+
+    Some( CipherText::CipherText( encrypted_key, ciphertext))
 }
 
-pub fn decrypt( private_key : &PrivateKey, ciphertext : CipherText) -> Option<Vec<u8>> {
-    match private_key {
-        &PrivateKey::AEX25519(ref private_key) => match ciphertext {
-            CipherText::AEX25519(ephemeral_public_key, ciphertext) => {
-                x25519::decrypt( &private_key, ( &ephemeral_public_key, ciphertext))
-            }
-        }
-    }
+pub fn decrypt( rng : &SystemRandom, private_key : &PrivateKey, CipherText::CipherText(encrypted_key, ciphertext) : CipherText) -> Option<Vec<u8>> {
+    let key = decrypt_symmetric_key( rng, &ToAlgorithm::to_algorithm( &ciphertext), private_key, &encrypted_key)?;
+
+    se::decrypt( &key, ciphertext).ok()
 }
 
 impl ToAlgorithm for PublicKey {
@@ -76,13 +72,22 @@ impl ToAlgorithm for PrivateKey {
     }
 }
 
-impl ToAlgorithm for CipherText {
+impl ToAlgorithm for EncryptedKey {
     type Algorithm = Algorithm;
 
     fn to_algorithm( &self) -> Self::Algorithm {
         match *self {
-            CipherText::AEX25519(_,_) => Algorithm::AEX25519
+            EncryptedKey::AEX25519(_) => Algorithm::AEX25519
         }
+    }
+}
+
+impl ToAlgorithm for CipherText {
+    type Algorithm = Algorithm;
+
+    fn to_algorithm( &self) -> Self::Algorithm {
+        let CipherText::CipherText(ek, _) = self;
+        ToAlgorithm::to_algorithm( ek)
     }
 }
 

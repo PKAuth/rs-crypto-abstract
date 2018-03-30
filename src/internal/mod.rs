@@ -1,9 +1,11 @@
 
+pub mod asym;
+
 use boolinator::Boolinator;
 use ring::digest::{SHA256}; // , digest};
 use ring::pbkdf2;
 
-pub fn derive_key_256( salt : &[u8], password : &[u8], iterations : u32) -> [u8;32] {
+pub(crate) fn derive_key_256( salt : &[u8], password : &[u8], iterations : u32) -> [u8;32] {
     let mut key = [0;32];
     pbkdf2::derive( &SHA256, iterations, &salt, &password, &mut key);
     key
@@ -15,7 +17,7 @@ pub fn derive_key_256( salt : &[u8], password : &[u8], iterations : u32) -> [u8;
 //     u8_to_fixed_length_32( sha.as_ref()).unwrap()
 // }
 
-pub fn u8_to_fixed_length_32( data : &[u8]) -> Option<[u8; 32]> {
+pub(crate) fn u8_to_fixed_length_32( data : &[u8]) -> Option<[u8; 32]> {
     // Check length.
     (data.len() == 32).as_option()?;
 
@@ -28,7 +30,7 @@ pub fn u8_to_fixed_length_32( data : &[u8]) -> Option<[u8; 32]> {
     Some( res)
 }
 
-pub fn u8_to_fixed_length_64( data : &[u8]) -> Option<[u8; 64]> {
+pub(crate) fn u8_to_fixed_length_64( data : &[u8]) -> Option<[u8; 64]> {
     // Check length.
     (data.len() == 64).as_option()?;
 
